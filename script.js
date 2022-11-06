@@ -71,6 +71,7 @@ const checkLose = () => {
   if (birdLeftCoord > hole.x && bird.x < holeLeftCoord) {
     if (bird.y <= hole.y || birdBottomCoord >= holeBottomCoord) {
       game.started = false
+      game.score = 0
       hole.x = 500
       bird.y = 150
       bird.vertSpeed = 0

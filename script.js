@@ -1,4 +1,4 @@
-const canvas = document.getElementById("game-canvas")
+const canvas = document.getElementById("game-board")
 const ctx = canvas.getContext("2d")
 
 canvas.width = 350
@@ -13,12 +13,12 @@ birdImg.src = "./images/bird.png"
 const pipeImg = document.createElement("img")
 pipeImg.src = "./images/pipe.png"
 
-const menu = document.createElement("img")
-menu.src = "./images/menu.png"
+const menuImg = document.createElement("img")
+menuImg.src = "./images/menu.png"
 
-const deltaTime = 0.4
+const deltaTime = 1.5
 const jumpSpeed = -7
-const fallingConstant = 0.4
+const fallingConstant = 0.5
 
 const game = {
   started: false,
@@ -26,7 +26,7 @@ const game = {
 }
 
 const bird = {
-  width: 60,
+  width: 65,
   height: 45,
   x: 50,
   y: 150,
@@ -37,7 +37,7 @@ const hole = {
   width: 60,
   height: 200,
   x: 500,
-  y: 250,
+  y: Math.random() * 450,
 }
 
 canvas.addEventListener("click", () => {
@@ -46,12 +46,30 @@ canvas.addEventListener("click", () => {
 })
 
 const moveHole = () => {
-  hole.x -= 2
+  hole.x -= 3
 
-  if (hole.x < -1 * hole.width) {
+  if (hole.x < -hole.width) {
     hole.x = canvas.width
     hole.y = Math.random() * 450
     game.score++
+  }
+}
+
+const checkLose = () => {
+  const birdRightCoord = bird.x + bird.width
+  const birdBottomCoord = bird.y + bird.height
+  const holeRightCoord = hole.x + hole.width
+  const holeBottomCoord = hole.y + hole.height
+
+  if (birdRightCoord > hole.x && bird.x < holeRightCoord) {
+    if (bird.y <= hole.y || birdBottomCoord >= holeBottomCoord) {
+      game.started = false
+      game.score = 0
+      bird.y = 150
+      bird.vertSpeed = 0
+      hole.x = 500
+      hole.y = Math.random() * 450
+    }
   }
 }
 
@@ -62,43 +80,31 @@ const writeScore = () => {
   ctx.strokeText(game.score, 170, 60)
 }
 
-const checkLose = () => {
-  const birdLeftCoord = bird.x + bird.width
-  const birdBottomCoord = bird.y + bird.height
-  const holeLeftCoord = hole.x + hole.width
-  const holeBottomCoord = hole.y + hole.height
-
-  if (birdLeftCoord > hole.x && bird.x < holeLeftCoord) {
-    if (bird.y <= hole.y || birdBottomCoord >= holeBottomCoord) {
-      game.started = false
-      game.score = 0
-      hole.x = 500
-      bird.y = 150
-      bird.vertSpeed = 0
-    }
+const updateGame = () => {
+  if (!game.started) {
+    return
   }
+  bird.y += bird.vertSpeed * deltaTime
+  bird.vertSpeed += fallingConstant * deltaTime
+  moveHole()
+  checkLose()
 }
 
-const updateGame = () => {
-  requestAnimationFrame(updateGame)
-
+const drawGame = () => {
+  requestAnimationFrame(drawGame)
   ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height)
 
   if (!game.started) {
-    ctx.drawImage(menu, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(menuImg, 0, 0, canvas.width, canvas.height)
     return
   }
-
-  bird.y = bird.y + bird.vertSpeed * deltaTime
-  bird.vertSpeed += fallingConstant * deltaTime
-  moveHole()
 
   ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height)
   ctx.drawImage(pipeImg, hole.x, hole.y - 600, hole.width, 600)
   ctx.drawImage(pipeImg, hole.x, hole.y + hole.height, hole.width, 600)
 
   writeScore()
-  checkLose()
 }
 
-updateGame()
+setInterval(updateGame, 1000 / 30)
+drawGame()

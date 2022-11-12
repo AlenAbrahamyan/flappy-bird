@@ -7,18 +7,24 @@ canvas.height = 650
 const backgroundImg = document.createElement("img")
 backgroundImg.src = "./images/background.png"
 
-const birdImg = document.createElement("img")
-birdImg.src = "./images/bird.png"
+const bird0 = document.createElement("img");
+bird0.src = "./images/bird-0.png";
 
-const pipeImg = document.createElement("img")
-pipeImg.src = "./images/pipe.png"
+const bird1 = document.createElement("img");
+bird1.src = "./images/bird-1.png";
 
-const menuImg = document.createElement("img")
-menuImg.src = "./images/menu.png"
+const bird2 = document.createElement("img");
+bird2.src = "./images/bird-2.png";
 
-const deltaTime = 1.5
-const jumpSpeed = -7
-const fallingConstant = 0.5
+const pipeImg = document.createElement("img");
+pipeImg.src = "./images/pipe.png";
+
+const menuImg = document.createElement("img");
+menuImg.src = "./images/menu.png";
+
+const deltaTime = 1.5;
+const jumpSpeed = -7;
+const fallingConstant = 0.5;
 
 const game = {
   started: false,
@@ -84,11 +90,32 @@ const updateGame = () => {
   if (!game.started) {
     return
   }
-  bird.y += bird.vertSpeed * deltaTime
-  bird.vertSpeed += fallingConstant * deltaTime
-  moveHole()
-  checkLose()
-}
+  bird.y += bird.vertSpeed * deltaTime;
+  bird.vertSpeed += fallingConstant * deltaTime;
+  moveHole();
+  checkLose();
+};
+
+let animationIndex = 0;
+let frameCount = 0;
+const BIRD_ANIMATION_FRAMERATE = 8;
+
+const updateBirdAnimation = () => {
+  const birdFrames = [bird0, bird1, bird2];
+  // could've had changed the source every time, but that
+  // loads the image every time we change the source
+  // this way frames are loaded only once
+  ctx.drawImage(birdFrames[animationIndex], bird.x, bird.y, bird.width, bird.height);
+
+  // since updating bird animation on every frame is too fast
+  // decided to keep the frame rate on 8
+  if (frameCount / BIRD_ANIMATION_FRAMERATE !== 1) {
+    frameCount++;
+  } else {
+    frameCount = 0;
+    animationIndex = (animationIndex + 1) % 3;
+  }
+};
 
 const drawGame = () => {
   requestAnimationFrame(drawGame)
@@ -99,7 +126,7 @@ const drawGame = () => {
     return
   }
 
-  ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height)
+  updateBirdAnimation()
   ctx.drawImage(pipeImg, hole.x, hole.y - 600, hole.width, 600)
   ctx.drawImage(pipeImg, hole.x, hole.y + hole.height, hole.width, 600)
 

@@ -104,7 +104,7 @@ const updateBirdAnimation = () => {
   const birdFrames = [bird0, bird1, bird2];
   // could've had changed the source every time, but that
   // loads the image every time we change the source
-  // this way frames are loaded only once
+  // this way frames are loaded only once.
   ctx.drawImage(birdFrames[animationIndex], bird.x, bird.y, bird.width, bird.height);
 
   // since updating bird animation on every frame is too fast

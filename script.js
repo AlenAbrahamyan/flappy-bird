@@ -1,6 +1,6 @@
 const canvas = document.getElementById("game-board")
 const ctx = canvas.getContext("2d")
-//////////////////
+////////////////////
 canvas.width = 350
 canvas.height = 650
 
